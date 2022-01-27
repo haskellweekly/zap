@@ -3,8 +3,9 @@ cabal-version: 2.2
 name: hw
 version: 0
 
-build-type: Simple
 category: Haskell
+data-dir: data
+data-files: favicon.ico
 description: The web server that powers Haskell Weekly.
 license-file: LICENSE.txt
 license: MIT
@@ -46,13 +47,16 @@ common executable
 library
     import: library
 
+    autogen-modules: Paths_hw
     build-depends:
         , bytestring ^>= 0.11.2
         , http-types ^>= 0.12.3
+        , text ^>= 2.0
         , wai ^>= 3.2.3
         , warp ^>= 3.3.18
     exposed-modules: HW
     hs-source-dirs: source/library
+    other-modules: Paths_hw
 
 executable hw
     import: executable
