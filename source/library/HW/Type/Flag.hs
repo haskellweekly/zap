@@ -10,6 +10,7 @@ import qualified System.Console.GetOpt as Console
 
 data Flag
     = Help
+    | Port String
     | Version
     deriving (Eq, Show)
 
@@ -35,6 +36,11 @@ options =
         ["help"]
         (Console.NoArg Help)
         "shows this help message"
+    , Console.Option
+        []
+        ["port"]
+        (Console.ReqArg Port "PORT")
+        "sets the port number"
     , Console.Option
         ['v']
         ["version"]

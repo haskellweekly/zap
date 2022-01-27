@@ -17,8 +17,9 @@ import qualified System.Exit as Exit
 
 main :: IO ()
 main = do
-    _config <- getConfig
-    Warp.runSettings Warp.defaultSettings $ \request respond ->
+    config <- getConfig
+    let settings = configToSettings config
+    Warp.runSettings settings $ \request respond ->
         case Text.unpack <$> Wai.pathInfo request of
             ["favicon.ico"] ->
                 case Http.parseMethod $ Wai.requestMethod request of
@@ -52,3 +53,7 @@ getConfig = do
         putStrLn $ Version.showVersion Package.version
         Exit.exitSuccess
     pure config
+
+configToSettings :: Config.Config -> Warp.Settings
+configToSettings config =
+    Warp.setPort (Config.port config) Warp.defaultSettings

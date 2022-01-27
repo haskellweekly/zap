@@ -59,6 +59,7 @@ library
     exposed-modules:
         HW
         HW.Exception.InvalidOption
+        HW.Exception.InvalidPort
         HW.Exception.UnexpectedArgument
         HW.Exception.UnknownOption
         HW.Type.Config
