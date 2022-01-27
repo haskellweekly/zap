@@ -1,0 +1,44 @@
+cabal-version: 2.2
+
+name: hw
+version: 0
+
+build-type: Simple
+category: Haskell
+description: The web server that powers Haskell Weekly.
+license-file: LICENSE.txt
+license: MIT
+maintainer: Taylor Fausak
+synopsis: Haskell Weekly
+
+source-repository head
+    location: https://github.com/haskellweekly/hwng
+    type: git
+
+flag pedantic
+    default: False
+    manual: True
+
+common library
+    build-depends:
+        base >= 4.15.0 && < 4.16
+    default-language: Haskell2010
+    ghc-options:
+        -Weverything
+        -Wno-implicit-prelude
+        -Wno-missing-deriving-strategies
+        -Wno-missing-export-lists
+        -Wno-missing-exported-signatures
+        -Wno-missing-safe-haskell-mode
+        -Wno-prepositive-qualified-module
+        -Wno-safe
+        -Wno-unsafe
+
+    if flag(pedantic)
+        ghc-options: -Werror
+
+library
+    import: library
+
+    exposed-modules: HW
+    hs-source-dirs: source/library
