@@ -49,6 +49,12 @@ library
     exposed-modules: HW
     hs-source-dirs: source/library
 
+executable hw
+    import: executable
+
+    hs-source-dirs: source/executable
+    main-is: Main.hs
+
 test-suite hw-test-suite
     import: executable
 
