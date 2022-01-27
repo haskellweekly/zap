@@ -1,4 +1,5 @@
-import HW ()
+module Main
+    ( module HW
+    ) where
 
-main :: IO ()
-main = pure ()
+import HW (main)
