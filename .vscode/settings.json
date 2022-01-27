@@ -1,0 +1,3 @@
+{
+    "purple-yolk.brittany.command": "brittany --config-file config/brittany.yaml --write-mode inplace"
+}
