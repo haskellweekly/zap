@@ -37,8 +37,21 @@ common library
     if flag(pedantic)
         ghc-options: -Werror
 
+common executable
+    import: library
+
+    build-depends: hw
+    ghc-options: -rtsopts -threaded
+
 library
     import: library
 
     exposed-modules: HW
     hs-source-dirs: source/library
+
+test-suite hw-test-suite
+    import: executable
+
+    hs-source-dirs: source/test-suite
+    main-is: Main.hs
+    type: exitcode-stdio-1.0
