@@ -2,6 +2,7 @@ module HW where
 
 import qualified Control.Monad as Monad
 import qualified Data.ByteString.Lazy as LazyByteString
+import Data.Function ((&))
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Encoding
 import qualified Data.Version as Version
@@ -56,4 +57,5 @@ getConfig = do
 
 configToSettings :: Config.Config -> Warp.Settings
 configToSettings config =
-    Warp.setPort (Config.port config) Warp.defaultSettings
+    Warp.defaultSettings & Warp.setHost (Config.host config) & Warp.setPort
+        (Config.port config)

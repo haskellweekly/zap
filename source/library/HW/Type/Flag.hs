@@ -10,6 +10,7 @@ import qualified System.Console.GetOpt as Console
 
 data Flag
     = Help
+    | Host String
     | Port String
     | Version
     deriving (Eq, Show)
@@ -37,13 +38,18 @@ options =
         (Console.NoArg Help)
         "shows this help message"
     , Console.Option
-        []
-        ["port"]
-        (Console.ReqArg Port "PORT")
-        "sets the port number"
-    , Console.Option
         ['v']
         ["version"]
         (Console.NoArg Version)
         "shows the version number"
+    , Console.Option
+        []
+        ["host"]
+        (Console.ReqArg Host "HOST")
+        "sets the host interface"
+    , Console.Option
+        []
+        ["port"]
+        (Console.ReqArg Port "PORT")
+        "sets the port number"
     ]
