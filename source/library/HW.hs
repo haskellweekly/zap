@@ -76,6 +76,7 @@ configToSettings config =
     Warp.defaultSettings
         & Warp.setBeforeMainLoop (beforeMainLoop config)
         & Warp.setHost (Config.host config)
+        & Warp.setLogger logger
         & Warp.setPort (Config.port config)
         & Warp.setServerName ByteString.empty
 
@@ -85,4 +86,11 @@ beforeMainLoop config = putStrLn $ unwords
     , show $ Config.host config
     , "port"
     , show $ Config.port config
+    ]
+
+logger :: Wai.Request -> Http.Status -> Maybe Integer -> IO ()
+logger request status _ = putStrLn $ unwords
+    [ show $ Http.statusCode status
+    , Text.unpack . Encoding.decodeUtf8Lenient $ Wai.requestMethod request
+    , Text.unpack . Encoding.decodeUtf8Lenient $ Wai.rawPathInfo request
     ]
