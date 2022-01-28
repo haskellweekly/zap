@@ -57,6 +57,22 @@ main = do
                         Http.methodNotAllowed405
                         []
                         LazyByteString.empty
+            ["robots.txt"] ->
+                case Http.parseMethod $ Wai.requestMethod request of
+                    Right Http.GET -> do
+                        filePath <- Package.getDataFileName "robots.txt"
+                        respond $ Wai.responseFile
+                            Http.ok200
+                            [ ( Http.hContentType
+                              , Encoding.encodeUtf8 $ Text.pack "text/plain"
+                              )
+                            ]
+                            filePath
+                            Nothing
+                    _ -> respond $ Wai.responseLBS
+                        Http.methodNotAllowed405
+                        []
+                        LazyByteString.empty
             _ -> respond
                 $ Wai.responseLBS Http.notFound404 [] LazyByteString.empty
 

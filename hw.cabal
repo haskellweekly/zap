@@ -8,6 +8,7 @@ data-dir: data
 data-files:
     bootstrap.css
     favicon.ico
+    robots.txt
 description: The web server that powers Haskell Weekly.
 license-file: LICENSE.txt
 license: MIT
