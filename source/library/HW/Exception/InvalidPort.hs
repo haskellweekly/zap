@@ -1,6 +1,6 @@
 module HW.Exception.InvalidPort where
 
-import qualified Control.Monad.Catch as Exception
+import qualified HW.Vendor.Exception as Exception
 
 newtype InvalidPort
     = InvalidPort String

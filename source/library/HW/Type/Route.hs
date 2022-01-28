@@ -1,8 +1,8 @@
 module HW.Type.Route where
 
-import qualified Control.Monad.Catch as Exception
-import qualified Data.Text as Text
 import qualified HW.Exception.UnknownRoute as UnknownRoute
+import qualified HW.Vendor.Exception as Exception
+import qualified HW.Vendor.Text as Text
 
 data Route
     = Favicon

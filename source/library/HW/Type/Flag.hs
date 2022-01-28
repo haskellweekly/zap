@@ -1,11 +1,11 @@
 module HW.Type.Flag where
 
-import qualified Control.Monad.Catch as Exception
 import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified HW.Exception.InvalidOption as InvalidOption
 import qualified HW.Exception.UnexpectedArgument as UnexpectedArgument
 import qualified HW.Exception.UnknownOption as UnknownOption
+import qualified HW.Vendor.Exception as Exception
 import qualified System.Console.GetOpt as Console
 
 data Flag

@@ -72,6 +72,14 @@ library
         HW.Type.Config
         HW.Type.Flag
         HW.Type.Route
+        HW.Vendor.ByteString
+        HW.Vendor.Exception
+        HW.Vendor.Http
+        HW.Vendor.Map
+        HW.Vendor.Text
+        HW.Vendor.Wai
+        HW.Vendor.Warp
+        HW.Vendor.Xml
     hs-source-dirs: source/library
     other-modules: Paths_hw
 

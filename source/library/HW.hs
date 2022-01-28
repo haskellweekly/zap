@@ -1,29 +1,26 @@
 module HW where
 
-import qualified Control.Monad.Catch as Exception
-import qualified Data.ByteString as ByteString
-import qualified Data.ByteString.Lazy as LazyByteString
 import qualified Data.Char as Char
 import Data.Function ((&))
 import qualified Data.List as List
-import qualified Data.Map as Map
 import qualified Data.Proxy as Proxy
-import qualified Data.Text as Text
-import qualified Data.Text.Encoding as Text
-import qualified Data.Text.Encoding.Error as Text
 import qualified Data.Version as Version
 import qualified HW.Exception.UnknownRoute as UnknownRoute
 import qualified HW.Type.Config as Config
 import qualified HW.Type.Flag as Flag
 import qualified HW.Type.Route as Route
-import qualified Network.HTTP.Types as Http
-import qualified Network.Wai as Wai
-import qualified Network.Wai.Handler.Warp as Warp
+import qualified HW.Vendor.ByteString as ByteString
+import qualified HW.Vendor.Exception as Exception
+import qualified HW.Vendor.Http as Http
+import qualified HW.Vendor.Map as Map
+import qualified HW.Vendor.Text as Text
+import qualified HW.Vendor.Wai as Wai
+import qualified HW.Vendor.Warp as Warp
+import qualified HW.Vendor.Xml as Xml
 import qualified Paths_hw as Package
 import qualified System.Console.GetOpt as Console
 import qualified System.Environment as Environment
 import qualified System.Exit as Exit
-import qualified Text.XML as Xml
 
 main :: IO ()
 main = do
@@ -48,7 +45,7 @@ main = do
                     _ -> respond $ Wai.responseLBS
                         Http.methodNotAllowed405
                         []
-                        LazyByteString.empty
+                        mempty
             Route.Favicon ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -64,7 +61,7 @@ main = do
                     _ -> respond $ Wai.responseLBS
                         Http.methodNotAllowed405
                         []
-                        LazyByteString.empty
+                        mempty
             Route.Robots ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -80,7 +77,7 @@ main = do
                     _ -> respond $ Wai.responseLBS
                         Http.methodNotAllowed405
                         []
-                        LazyByteString.empty
+                        mempty
             Route.Style ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -96,7 +93,7 @@ main = do
                     _ -> respond $ Wai.responseLBS
                         Http.methodNotAllowed405
                         []
-                        LazyByteString.empty
+                        mempty
             Route.Template ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -112,7 +109,7 @@ main = do
                     _ -> respond $ Wai.responseLBS
                         Http.methodNotAllowed405
                         []
-                        LazyByteString.empty
+                        mempty
 
 getConfig :: IO Config.Config
 getConfig = do

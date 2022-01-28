@@ -1,11 +1,11 @@
 module HW.Type.Config where
 
 import qualified Control.Monad as Monad
-import qualified Control.Monad.Catch as Exception
 import qualified Data.String as String
 import qualified HW.Exception.InvalidPort as InvalidPort
 import qualified HW.Type.Flag as Flag
-import qualified Network.Wai.Handler.Warp as Warp
+import qualified HW.Vendor.Exception as Exception
+import qualified HW.Vendor.Warp as Warp
 import qualified Text.Read as Read
 
 data Config = Config
