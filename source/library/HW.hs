@@ -34,7 +34,15 @@ main = do
                         Xml.def
                         Xml.Document
                             { Xml.documentPrologue = Xml.Prologue
-                                { Xml.prologueBefore = []
+                                { Xml.prologueBefore =
+                                    [ Xml.MiscInstruction Xml.Instruction
+                                          { Xml.instructionTarget = Text.pack
+                                              "xml-stylesheet"
+                                          , Xml.instructionData =
+                                              Text.pack
+                                                  "type='text/xsl' href='/static/template'"
+                                          }
+                                    ]
                                 , Xml.prologueDoctype = Nothing
                                 , Xml.prologueAfter = []
                                 }
@@ -93,6 +101,22 @@ main = do
                             Http.ok200
                             [ ( Http.hContentType
                               , Text.encodeUtf8 $ Text.pack "text/css"
+                              )
+                            ]
+                            filePath
+                            Nothing
+                    _ -> respond $ Wai.responseLBS
+                        Http.methodNotAllowed405
+                        []
+                        LazyByteString.empty
+            ["static", "template"] ->
+                case Http.parseMethod $ Wai.requestMethod request of
+                    Right Http.GET -> do
+                        filePath <- Package.getDataFileName "index.xsl"
+                        respond $ Wai.responseFile
+                            Http.ok200
+                            [ ( Http.hContentType
+                              , Text.encodeUtf8 $ Text.pack "text/xsl"
                               )
                             ]
                             filePath

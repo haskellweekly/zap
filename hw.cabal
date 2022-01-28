@@ -8,6 +8,7 @@ data-dir: data
 data-files:
     favicon.ico
     index.css
+    index.xsl
     robots.txt
 description: The web server that powers Haskell Weekly.
 license-file: LICENSE.txt
