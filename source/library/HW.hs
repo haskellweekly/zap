@@ -42,10 +42,7 @@ main = do
                                 , Xml.elementAttributes = Map.empty
                                 , Xml.elementNodes = []
                                 }
-                    _ -> respond $ Wai.responseLBS
-                        Http.methodNotAllowed405
-                        []
-                        mempty
+                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
             Route.Favicon ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -58,10 +55,7 @@ main = do
                             ]
                             filePath
                             Nothing
-                    _ -> respond $ Wai.responseLBS
-                        Http.methodNotAllowed405
-                        []
-                        mempty
+                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
             Route.Robots ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -74,10 +68,7 @@ main = do
                             ]
                             filePath
                             Nothing
-                    _ -> respond $ Wai.responseLBS
-                        Http.methodNotAllowed405
-                        []
-                        mempty
+                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
             Route.Style ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -90,10 +81,7 @@ main = do
                             ]
                             filePath
                             Nothing
-                    _ -> respond $ Wai.responseLBS
-                        Http.methodNotAllowed405
-                        []
-                        mempty
+                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
             Route.Template ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -106,10 +94,7 @@ main = do
                             ]
                             filePath
                             Nothing
-                    _ -> respond $ Wai.responseLBS
-                        Http.methodNotAllowed405
-                        []
-                        mempty
+                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
 
 getConfig :: IO Config.Config
 getConfig = do
