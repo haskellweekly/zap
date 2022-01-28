@@ -10,6 +10,7 @@
         <html>
             <head>
                 <title>Haskell Weekly</title>
+                <link rel="stylesheet" href="/static/style" />
             </head>
             <body>
                 <h1>Haskell Weekly</h1>
