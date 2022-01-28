@@ -1,9 +1,11 @@
 module HW where
 
-import qualified Control.Monad as Monad
+import qualified Control.Monad.Catch as Exception
 import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Lazy as LazyByteString
+import qualified Data.Char as Char
 import Data.Function ((&))
+import qualified Data.List as List
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Encoding
 import qualified Data.Version as Version
@@ -46,15 +48,28 @@ getConfig :: IO Config.Config
 getConfig = do
     name <- Environment.getProgName
     arguments <- Environment.getArgs
+    result <- getConfigWith name arguments
+    case result of
+        Left message -> do
+            putStrLn message
+            Exit.exitSuccess
+        Right config -> pure config
+
+getConfigWith
+    :: Exception.MonadThrow m
+    => String
+    -> [String]
+    -> m (Either String Config.Config)
+getConfigWith name arguments = do
     flags <- Flag.fromArguments arguments
     config <- Config.fromFlags flags
-    Monad.when (Config.help config) $ do
-        putStr $ Console.usageInfo name Flag.options
-        Exit.exitSuccess
-    Monad.when (Config.version config) $ do
-        putStrLn $ Version.showVersion Package.version
-        Exit.exitSuccess
-    pure config
+    pure $ if Config.help config
+        then Left . List.dropWhileEnd Char.isSpace $ Console.usageInfo
+            name
+            Flag.options
+        else if Config.version config
+            then Left $ Version.showVersion Package.version
+            else Right config
 
 configToSettings :: Config.Config -> Warp.Settings
 configToSettings config =
