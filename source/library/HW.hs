@@ -5,6 +5,7 @@ import Data.Function ((&))
 import qualified Data.List as List
 import qualified Data.Proxy as Proxy
 import qualified Data.Version as Version
+import qualified HW.Exception.DisallowedMethod as DisallowedMethod
 import qualified HW.Exception.InvalidMethod as InvalidMethod
 import qualified HW.Exception.UnknownRoute as UnknownRoute
 import qualified HW.Handler.Common as Common
@@ -44,27 +45,27 @@ main = do
                 Http.GET -> do
                     response <- Index.Get.handler
                     respond response
-                _ -> respond $ statusResponse Http.methodNotAllowed405 []
+                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
             Route.Favicon -> case method of
                 Http.GET -> do
                     response <- Favicon.Get.handler
                     respond response
-                _ -> respond $ statusResponse Http.methodNotAllowed405 []
+                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
             Route.Robots -> case method of
                 Http.GET -> do
                     response <- Robots.Get.handler
                     respond response
-                _ -> respond $ statusResponse Http.methodNotAllowed405 []
+                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
             Route.Style -> case method of
                 Http.GET -> do
                     response <- Style.Get.handler
                     respond response
-                _ -> respond $ statusResponse Http.methodNotAllowed405 []
+                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
             Route.Template -> case method of
                 Http.GET -> do
                     response <- Template.Get.handler
                     respond response
-                _ -> respond $ statusResponse Http.methodNotAllowed405 []
+                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
 
 getConfig :: IO Config.Config
 getConfig = do
@@ -122,12 +123,16 @@ logger request status _ = putStrLn $ unwords
 
 onExceptionResponse :: Exception.SomeException -> Wai.Response
 onExceptionResponse e
-    | isExceptionType (Proxy.Proxy :: Proxy.Proxy UnknownRoute.UnknownRoute) e
-    = statusResponse Http.notFound404 []
+    | isExceptionType
+        (Proxy.Proxy :: Proxy.Proxy DisallowedMethod.DisallowedMethod)
+        e
+    = statusResponse Http.methodNotAllowed405 []
     | isExceptionType
         (Proxy.Proxy :: Proxy.Proxy InvalidMethod.InvalidMethod)
         e
     = statusResponse Http.methodNotAllowed405 []
+    | isExceptionType (Proxy.Proxy :: Proxy.Proxy UnknownRoute.UnknownRoute) e
+    = statusResponse Http.notFound404 []
     | otherwise
     = statusResponse Http.internalServerError500 []
 
