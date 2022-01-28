@@ -53,22 +53,6 @@ main = do
                     Http.methodNotAllowed405
                     []
                     LazyByteString.empty
-            ["bootstrap.css"] ->
-                case Http.parseMethod $ Wai.requestMethod request of
-                    Right Http.GET -> do
-                        filePath <- Package.getDataFileName "bootstrap.css"
-                        respond $ Wai.responseFile
-                            Http.ok200
-                            [ ( Http.hContentType
-                              , Text.encodeUtf8 $ Text.pack "text/css"
-                              )
-                            ]
-                            filePath
-                            Nothing
-                    _ -> respond $ Wai.responseLBS
-                        Http.methodNotAllowed405
-                        []
-                        LazyByteString.empty
             ["favicon.ico"] ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -93,6 +77,22 @@ main = do
                             Http.ok200
                             [ ( Http.hContentType
                               , Text.encodeUtf8 $ Text.pack "text/plain"
+                              )
+                            ]
+                            filePath
+                            Nothing
+                    _ -> respond $ Wai.responseLBS
+                        Http.methodNotAllowed405
+                        []
+                        LazyByteString.empty
+            ["static", "style"] ->
+                case Http.parseMethod $ Wai.requestMethod request of
+                    Right Http.GET -> do
+                        filePath <- Package.getDataFileName "index.css"
+                        respond $ Wai.responseFile
+                            Http.ok200
+                            [ ( Http.hContentType
+                              , Text.encodeUtf8 $ Text.pack "text/css"
                               )
                             ]
                             filePath
