@@ -5,6 +5,7 @@ import Data.Function ((&))
 import qualified Data.List as List
 import qualified Data.Proxy as Proxy
 import qualified Data.Version as Version
+import qualified HW.Exception.InvalidMethod as InvalidMethod
 import qualified HW.Exception.UnknownRoute as UnknownRoute
 import qualified HW.Handler.Common as Common
 import qualified HW.Handler.Favicon.Get as Favicon.Get
@@ -33,38 +34,37 @@ main = do
     config <- getConfig
     let settings = configToSettings config
     Warp.runSettings settings $ \request respond -> do
+        method <-
+            either (Exception.throwM . InvalidMethod.InvalidMethod) pure
+            . Http.parseMethod
+            $ Wai.requestMethod request
         route <- Route.fromPathInfo $ Wai.pathInfo request
         case route of
-            Route.Index ->
-                case Http.parseMethod $ Wai.requestMethod request of
-                    Right Http.GET -> do
-                        response <- Index.Get.handler
-                        respond response
-                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
-            Route.Favicon ->
-                case Http.parseMethod $ Wai.requestMethod request of
-                    Right Http.GET -> do
-                        response <- Favicon.Get.handler
-                        respond response
-                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
-            Route.Robots ->
-                case Http.parseMethod $ Wai.requestMethod request of
-                    Right Http.GET -> do
-                        response <- Robots.Get.handler
-                        respond response
-                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
-            Route.Style ->
-                case Http.parseMethod $ Wai.requestMethod request of
-                    Right Http.GET -> do
-                        response <- Style.Get.handler
-                        respond response
-                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
-            Route.Template ->
-                case Http.parseMethod $ Wai.requestMethod request of
-                    Right Http.GET -> do
-                        response <- Template.Get.handler
-                        respond response
-                    _ -> respond $ statusResponse Http.methodNotAllowed405 []
+            Route.Index -> case method of
+                Http.GET -> do
+                    response <- Index.Get.handler
+                    respond response
+                _ -> respond $ statusResponse Http.methodNotAllowed405 []
+            Route.Favicon -> case method of
+                Http.GET -> do
+                    response <- Favicon.Get.handler
+                    respond response
+                _ -> respond $ statusResponse Http.methodNotAllowed405 []
+            Route.Robots -> case method of
+                Http.GET -> do
+                    response <- Robots.Get.handler
+                    respond response
+                _ -> respond $ statusResponse Http.methodNotAllowed405 []
+            Route.Style -> case method of
+                Http.GET -> do
+                    response <- Style.Get.handler
+                    respond response
+                _ -> respond $ statusResponse Http.methodNotAllowed405 []
+            Route.Template -> case method of
+                Http.GET -> do
+                    response <- Template.Get.handler
+                    respond response
+                _ -> respond $ statusResponse Http.methodNotAllowed405 []
 
 getConfig :: IO Config.Config
 getConfig = do
@@ -124,6 +124,10 @@ onExceptionResponse :: Exception.SomeException -> Wai.Response
 onExceptionResponse e
     | isExceptionType (Proxy.Proxy :: Proxy.Proxy UnknownRoute.UnknownRoute) e
     = statusResponse Http.notFound404 []
+    | isExceptionType
+        (Proxy.Proxy :: Proxy.Proxy InvalidMethod.InvalidMethod)
+        e
+    = statusResponse Http.methodNotAllowed405 []
     | otherwise
     = statusResponse Http.internalServerError500 []
 
