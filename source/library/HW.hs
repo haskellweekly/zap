@@ -35,32 +35,15 @@ main = do
             Route.Index ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
-                        respond . Wai.responseLBS Http.ok200 [] $ Xml.renderLBS
-                            Xml.def
-                            Xml.Document
-                                { Xml.documentPrologue = Xml.Prologue
-                                    { Xml.prologueBefore =
-                                        [ Xml.MiscInstruction Xml.Instruction
-                                              { Xml.instructionTarget =
-                                                  Text.pack "xml-stylesheet"
-                                              , Xml.instructionData =
-                                                  Text.pack
-                                                      "type='text/xsl' href='/static/template'"
-                                              }
-                                        ]
-                                    , Xml.prologueDoctype = Nothing
-                                    , Xml.prologueAfter = []
+                        respond . xmlResponse Http.ok200 [] $ elementToDocument
+                            Xml.Element
+                                { Xml.elementName = Xml.Name
+                                    { Xml.nameLocalName = Text.pack "root"
+                                    , Xml.nameNamespace = Nothing
+                                    , Xml.namePrefix = Nothing
                                     }
-                                , Xml.documentRoot = Xml.Element
-                                    { Xml.elementName = Xml.Name
-                                        { Xml.nameLocalName = Text.pack "root"
-                                        , Xml.nameNamespace = Nothing
-                                        , Xml.namePrefix = Nothing
-                                        }
-                                    , Xml.elementAttributes = Map.empty
-                                    , Xml.elementNodes = []
-                                    }
-                                , Xml.documentEpilogue = []
+                                , Xml.elementAttributes = Map.empty
+                                , Xml.elementNodes = []
                                 }
                     _ -> respond $ Wai.responseLBS
                         Http.methodNotAllowed405
@@ -188,9 +171,9 @@ logger request status _ = putStrLn $ unwords
 onExceptionResponse :: Exception.SomeException -> Wai.Response
 onExceptionResponse e
     | isExceptionType (Proxy.Proxy :: Proxy.Proxy UnknownRoute.UnknownRoute) e
-    = Wai.responseLBS Http.notFound404 [] LazyByteString.empty
+    = statusResponse Http.notFound404 []
     | otherwise
-    = Wai.responseLBS Http.internalServerError500 [] LazyByteString.empty
+    = statusResponse Http.internalServerError500 []
 
 isExceptionType
     :: Exception.Exception e
@@ -201,3 +184,63 @@ isExceptionType proxy someException =
     case Exception.fromException someException of
         Nothing -> False
         Just exception -> let _ = Proxy.asProxyTypeOf exception proxy in True
+
+elementToDocument :: Xml.Element -> Xml.Document
+elementToDocument element = Xml.Document
+    { Xml.documentPrologue = Xml.Prologue
+        { Xml.prologueBefore =
+            [ Xml.MiscInstruction Xml.Instruction
+                  { Xml.instructionTarget = Text.pack "xml-stylesheet"
+                  , Xml.instructionData = Text.pack
+                      "type='text/xsl' href='/static/template'"
+                  }
+            ]
+        , Xml.prologueDoctype = Nothing
+        , Xml.prologueAfter = []
+        }
+    , Xml.documentRoot = element
+    , Xml.documentEpilogue = []
+    }
+
+xmlResponse
+    :: Http.Status -> Http.ResponseHeaders -> Xml.Document -> Wai.Response
+xmlResponse status headers = Wai.responseLBS status headers
+    . Xml.renderLBS Xml.def { Xml.rsPretty = True }
+
+statusResponse :: Http.Status -> Http.ResponseHeaders -> Wai.Response
+statusResponse status headers =
+    xmlResponse status headers . elementToDocument $ Xml.Element
+        { Xml.elementName = Xml.Name
+            { Xml.nameLocalName = Text.pack "status"
+            , Xml.nameNamespace = Nothing
+            , Xml.namePrefix = Nothing
+            }
+        , Xml.elementAttributes = Map.empty
+        , Xml.elementNodes =
+            [ Xml.NodeElement Xml.Element
+                { Xml.elementName = Xml.Name
+                    { Xml.nameLocalName = Text.pack "code"
+                    , Xml.nameNamespace = Nothing
+                    , Xml.namePrefix = Nothing
+                    }
+                , Xml.elementAttributes = Map.empty
+                , Xml.elementNodes =
+                    [ Xml.NodeContent . Text.pack . show $ Http.statusCode
+                          status
+                    ]
+                }
+            , Xml.NodeElement Xml.Element
+                { Xml.elementName = Xml.Name
+                    { Xml.nameLocalName = Text.pack "message"
+                    , Xml.nameNamespace = Nothing
+                    , Xml.namePrefix = Nothing
+                    }
+                , Xml.elementAttributes = Map.empty
+                , Xml.elementNodes =
+                    [ Xml.NodeContent
+                      . Text.decodeUtf8With Text.lenientDecode
+                      $ Http.statusMessage status
+                    ]
+                }
+            ]
+        }
