@@ -74,6 +74,15 @@ getConfigWith name arguments = do
 configToSettings :: Config.Config -> Warp.Settings
 configToSettings config =
     Warp.defaultSettings
+        & Warp.setBeforeMainLoop (beforeMainLoop config)
         & Warp.setHost (Config.host config)
         & Warp.setPort (Config.port config)
         & Warp.setServerName ByteString.empty
+
+beforeMainLoop :: Config.Config -> IO ()
+beforeMainLoop config = putStrLn $ unwords
+    [ "listening on"
+    , show $ Config.host config
+    , "port"
+    , show $ Config.port config
+    ]
