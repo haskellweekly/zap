@@ -5,7 +5,9 @@ version: 0.0.0.0
 
 category: Haskell
 data-dir: data
-data-files: favicon.ico
+data-files:
+    bootstrap.css
+    favicon.ico
 description: The web server that powers Haskell Weekly.
 license-file: LICENSE.txt
 license: MIT

@@ -25,6 +25,22 @@ main = do
     let settings = configToSettings config
     Warp.runSettings settings $ \request respond ->
         case Text.unpack <$> Wai.pathInfo request of
+            ["bootstrap.css"] ->
+                case Http.parseMethod $ Wai.requestMethod request of
+                    Right Http.GET -> do
+                        filePath <- Package.getDataFileName "bootstrap.css"
+                        respond $ Wai.responseFile
+                            Http.ok200
+                            [ ( Http.hContentType
+                              , Encoding.encodeUtf8 $ Text.pack "text/css"
+                              )
+                            ]
+                            filePath
+                            Nothing
+                    _ -> respond $ Wai.responseLBS
+                        Http.methodNotAllowed405
+                        []
+                        LazyByteString.empty
             ["favicon.ico"] ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
