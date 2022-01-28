@@ -54,11 +54,13 @@ library
     autogen-modules: Paths_hw
     build-depends:
         , bytestring ^>= 0.11.2
+        , containers ^>= 0.6.5
         , exceptions ^>= 0.10.4
         , http-types ^>= 0.12.3
-        , text ^>= 2.0
+        , text ^>= 1.2.5
         , wai ^>= 3.2.3
         , warp ^>= 3.3.18
+        , xml-conduit ^>= 1.9.1
     exposed-modules:
         HW
         HW.Exception.InvalidOption

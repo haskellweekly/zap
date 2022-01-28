@@ -6,8 +6,10 @@ import qualified Data.ByteString.Lazy as LazyByteString
 import qualified Data.Char as Char
 import Data.Function ((&))
 import qualified Data.List as List
+import qualified Data.Map as Map
 import qualified Data.Text as Text
-import qualified Data.Text.Encoding as Encoding
+import qualified Data.Text.Encoding as Text
+import qualified Data.Text.Encoding.Error as Text
 import qualified Data.Version as Version
 import qualified HW.Type.Config as Config
 import qualified HW.Type.Flag as Flag
@@ -18,6 +20,7 @@ import qualified Paths_hw as Package
 import qualified System.Console.GetOpt as Console
 import qualified System.Environment as Environment
 import qualified System.Exit as Exit
+import qualified Text.XML as Xml
 
 main :: IO ()
 main = do
@@ -25,6 +28,31 @@ main = do
     let settings = configToSettings config
     Warp.runSettings settings $ \request respond ->
         case Text.unpack <$> Wai.pathInfo request of
+            [] -> case Http.parseMethod $ Wai.requestMethod request of
+                Right Http.GET -> do
+                    respond . Wai.responseLBS Http.ok200 [] $ Xml.renderLBS
+                        Xml.def
+                        Xml.Document
+                            { Xml.documentPrologue = Xml.Prologue
+                                { Xml.prologueBefore = []
+                                , Xml.prologueDoctype = Nothing
+                                , Xml.prologueAfter = []
+                                }
+                            , Xml.documentRoot = Xml.Element
+                                { Xml.elementName = Xml.Name
+                                    { Xml.nameLocalName = Text.pack "root"
+                                    , Xml.nameNamespace = Nothing
+                                    , Xml.namePrefix = Nothing
+                                    }
+                                , Xml.elementAttributes = Map.empty
+                                , Xml.elementNodes = []
+                                }
+                            , Xml.documentEpilogue = []
+                            }
+                _ -> respond $ Wai.responseLBS
+                    Http.methodNotAllowed405
+                    []
+                    LazyByteString.empty
             ["bootstrap.css"] ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
@@ -32,7 +60,7 @@ main = do
                         respond $ Wai.responseFile
                             Http.ok200
                             [ ( Http.hContentType
-                              , Encoding.encodeUtf8 $ Text.pack "text/css"
+                              , Text.encodeUtf8 $ Text.pack "text/css"
                               )
                             ]
                             filePath
@@ -48,7 +76,7 @@ main = do
                         respond $ Wai.responseFile
                             Http.ok200
                             [ ( Http.hContentType
-                              , Encoding.encodeUtf8 $ Text.pack "image/x-icon"
+                              , Text.encodeUtf8 $ Text.pack "image/x-icon"
                               )
                             ]
                             filePath
@@ -64,7 +92,7 @@ main = do
                         respond $ Wai.responseFile
                             Http.ok200
                             [ ( Http.hContentType
-                              , Encoding.encodeUtf8 $ Text.pack "text/plain"
+                              , Text.encodeUtf8 $ Text.pack "text/plain"
                               )
                             ]
                             filePath
@@ -123,6 +151,8 @@ beforeMainLoop config = putStrLn $ unwords
 logger :: Wai.Request -> Http.Status -> Maybe Integer -> IO ()
 logger request status _ = putStrLn $ unwords
     [ show $ Http.statusCode status
-    , Text.unpack . Encoding.decodeUtf8Lenient $ Wai.requestMethod request
-    , Text.unpack . Encoding.decodeUtf8Lenient $ Wai.rawPathInfo request
+    , Text.unpack . Text.decodeUtf8With Text.lenientDecode $ Wai.requestMethod
+        request
+    , Text.unpack . Text.decodeUtf8With Text.lenientDecode $ Wai.rawPathInfo
+        request
     ]
