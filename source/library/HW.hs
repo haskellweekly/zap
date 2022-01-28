@@ -6,6 +6,12 @@ import qualified Data.List as List
 import qualified Data.Proxy as Proxy
 import qualified Data.Version as Version
 import qualified HW.Exception.UnknownRoute as UnknownRoute
+import qualified HW.Handler.Common as Common
+import qualified HW.Handler.Favicon.Get as Favicon.Get
+import qualified HW.Handler.Index.Get as Index.Get
+import qualified HW.Handler.Robots.Get as Robots.Get
+import qualified HW.Handler.Style.Get as Style.Get
+import qualified HW.Handler.Template.Get as Template.Get
 import qualified HW.Type.Config as Config
 import qualified HW.Type.Flag as Flag
 import qualified HW.Type.Route as Route
@@ -32,68 +38,32 @@ main = do
             Route.Index ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
-                        respond . xmlResponse Http.ok200 [] $ elementToDocument
-                            Xml.Element
-                                { Xml.elementName = Xml.Name
-                                    { Xml.nameLocalName = Text.pack "root"
-                                    , Xml.nameNamespace = Nothing
-                                    , Xml.namePrefix = Nothing
-                                    }
-                                , Xml.elementAttributes = Map.empty
-                                , Xml.elementNodes = []
-                                }
+                        response <- Index.Get.handler
+                        respond response
                     _ -> respond $ statusResponse Http.methodNotAllowed405 []
             Route.Favicon ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
-                        filePath <- Package.getDataFileName "favicon.ico"
-                        respond $ Wai.responseFile
-                            Http.ok200
-                            [ ( Http.hContentType
-                              , Text.encodeUtf8 $ Text.pack "image/x-icon"
-                              )
-                            ]
-                            filePath
-                            Nothing
+                        response <- Favicon.Get.handler
+                        respond response
                     _ -> respond $ statusResponse Http.methodNotAllowed405 []
             Route.Robots ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
-                        filePath <- Package.getDataFileName "robots.txt"
-                        respond $ Wai.responseFile
-                            Http.ok200
-                            [ ( Http.hContentType
-                              , Text.encodeUtf8 $ Text.pack "text/plain"
-                              )
-                            ]
-                            filePath
-                            Nothing
+                        response <- Robots.Get.handler
+                        respond response
                     _ -> respond $ statusResponse Http.methodNotAllowed405 []
             Route.Style ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
-                        filePath <- Package.getDataFileName "index.css"
-                        respond $ Wai.responseFile
-                            Http.ok200
-                            [ ( Http.hContentType
-                              , Text.encodeUtf8 $ Text.pack "text/css"
-                              )
-                            ]
-                            filePath
-                            Nothing
+                        response <- Style.Get.handler
+                        respond response
                     _ -> respond $ statusResponse Http.methodNotAllowed405 []
             Route.Template ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
-                        filePath <- Package.getDataFileName "index.xsl"
-                        respond $ Wai.responseFile
-                            Http.ok200
-                            [ ( Http.hContentType
-                              , Text.encodeUtf8 $ Text.pack "text/xsl"
-                              )
-                            ]
-                            filePath
-                            Nothing
+                        response <- Template.Get.handler
+                        respond response
                     _ -> respond $ statusResponse Http.methodNotAllowed405 []
 
 getConfig :: IO Config.Config
@@ -167,31 +137,9 @@ isExceptionType proxy someException =
         Nothing -> False
         Just exception -> let _ = Proxy.asProxyTypeOf exception proxy in True
 
-elementToDocument :: Xml.Element -> Xml.Document
-elementToDocument element = Xml.Document
-    { Xml.documentPrologue = Xml.Prologue
-        { Xml.prologueBefore =
-            [ Xml.MiscInstruction Xml.Instruction
-                  { Xml.instructionTarget = Text.pack "xml-stylesheet"
-                  , Xml.instructionData = Text.pack
-                      "type='text/xsl' href='/static/template'"
-                  }
-            ]
-        , Xml.prologueDoctype = Nothing
-        , Xml.prologueAfter = []
-        }
-    , Xml.documentRoot = element
-    , Xml.documentEpilogue = []
-    }
-
-xmlResponse
-    :: Http.Status -> Http.ResponseHeaders -> Xml.Document -> Wai.Response
-xmlResponse status headers = Wai.responseLBS status headers
-    . Xml.renderLBS Xml.def { Xml.rsPretty = True }
-
 statusResponse :: Http.Status -> Http.ResponseHeaders -> Wai.Response
 statusResponse status headers =
-    xmlResponse status headers . elementToDocument $ Xml.Element
+    Common.xmlResponse status headers . Common.elementToDocument $ Xml.Element
         { Xml.elementName = Xml.Name
             { Xml.nameLocalName = Text.pack "status"
             , Xml.nameNamespace = Nothing

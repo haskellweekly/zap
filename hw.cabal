@@ -69,6 +69,12 @@ library
         HW.Exception.UnexpectedArgument
         HW.Exception.UnknownOption
         HW.Exception.UnknownRoute
+        HW.Handler.Common
+        HW.Handler.Favicon.Get
+        HW.Handler.Index.Get
+        HW.Handler.Robots.Get
+        HW.Handler.Style.Get
+        HW.Handler.Template.Get
         HW.Type.Config
         HW.Type.Flag
         HW.Type.Route
