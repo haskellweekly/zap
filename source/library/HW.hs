@@ -7,10 +7,12 @@ import qualified Data.Char as Char
 import Data.Function ((&))
 import qualified Data.List as List
 import qualified Data.Map as Map
+import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import qualified Data.Text.Encoding.Error as Text
 import qualified Data.Version as Version
+import qualified HW.Exception.UnknownRoute as UnknownRoute
 import qualified HW.Type.Config as Config
 import qualified HW.Type.Flag as Flag
 import qualified HW.Type.Route as Route
@@ -162,6 +164,7 @@ configToSettings config =
         & Warp.setBeforeMainLoop (beforeMainLoop config)
         & Warp.setHost (Config.host config)
         & Warp.setLogger logger
+        & Warp.setOnExceptionResponse onExceptionResponse
         & Warp.setPort (Config.port config)
         & Warp.setServerName ByteString.empty
 
@@ -181,3 +184,20 @@ logger request status _ = putStrLn $ unwords
     , Text.unpack . Text.decodeUtf8With Text.lenientDecode $ Wai.rawPathInfo
         request
     ]
+
+onExceptionResponse :: Exception.SomeException -> Wai.Response
+onExceptionResponse e
+    | isExceptionType (Proxy.Proxy :: Proxy.Proxy UnknownRoute.UnknownRoute) e
+    = Wai.responseLBS Http.notFound404 [] LazyByteString.empty
+    | otherwise
+    = Wai.responseLBS Http.internalServerError500 [] LazyByteString.empty
+
+isExceptionType
+    :: Exception.Exception e
+    => Proxy.Proxy e
+    -> Exception.SomeException
+    -> Bool
+isExceptionType proxy someException =
+    case Exception.fromException someException of
+        Nothing -> False
+        Just exception -> let _ = Proxy.asProxyTypeOf exception proxy in True
