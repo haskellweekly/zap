@@ -40,32 +40,30 @@ main = do
             . Http.parseMethod
             $ Wai.requestMethod request
         route <- Route.fromPathInfo $ Wai.pathInfo request
-        case route of
-            Route.Index -> case method of
-                Http.GET -> do
-                    response <- Index.Get.handler
-                    respond response
-                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
-            Route.Favicon -> case method of
-                Http.GET -> do
-                    response <- Favicon.Get.handler
-                    respond response
-                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
-            Route.Robots -> case method of
-                Http.GET -> do
-                    response <- Robots.Get.handler
-                    respond response
-                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
-            Route.Style -> case method of
-                Http.GET -> do
-                    response <- Style.Get.handler
-                    respond response
-                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
-            Route.Template -> case method of
-                Http.GET -> do
-                    response <- Template.Get.handler
-                    respond response
-                _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
+        handler <- getHandler method route
+        response <- handler
+        respond response
+
+type Handler = IO Wai.Response
+
+getHandler
+    :: Exception.MonadThrow m => Http.StdMethod -> Route.Route -> m Handler
+getHandler method route = case route of
+    Route.Favicon -> case method of
+        Http.GET -> pure Favicon.Get.handler
+        _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
+    Route.Index -> case method of
+        Http.GET -> pure Index.Get.handler
+        _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
+    Route.Robots -> case method of
+        Http.GET -> pure Robots.Get.handler
+        _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
+    Route.Style -> case method of
+        Http.GET -> pure Style.Get.handler
+        _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
+    Route.Template -> case method of
+        Http.GET -> pure Template.Get.handler
+        _ -> Exception.throwM $ DisallowedMethod.DisallowedMethod method
 
 getConfig :: IO Config.Config
 getConfig = do
