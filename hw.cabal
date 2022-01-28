@@ -68,8 +68,10 @@ library
         HW.Exception.InvalidPort
         HW.Exception.UnexpectedArgument
         HW.Exception.UnknownOption
+        HW.Exception.UnknownRoute
         HW.Type.Config
         HW.Type.Flag
+        HW.Type.Route
     hs-source-dirs: source/library
     other-modules: Paths_hw
 

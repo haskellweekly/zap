@@ -13,6 +13,7 @@ import qualified Data.Text.Encoding.Error as Text
 import qualified Data.Version as Version
 import qualified HW.Type.Config as Config
 import qualified HW.Type.Flag as Flag
+import qualified HW.Type.Route as Route
 import qualified Network.HTTP.Types as Http
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp
@@ -26,42 +27,44 @@ main :: IO ()
 main = do
     config <- getConfig
     let settings = configToSettings config
-    Warp.runSettings settings $ \request respond ->
-        case Text.unpack <$> Wai.pathInfo request of
-            [] -> case Http.parseMethod $ Wai.requestMethod request of
-                Right Http.GET -> do
-                    respond . Wai.responseLBS Http.ok200 [] $ Xml.renderLBS
-                        Xml.def
-                        Xml.Document
-                            { Xml.documentPrologue = Xml.Prologue
-                                { Xml.prologueBefore =
-                                    [ Xml.MiscInstruction Xml.Instruction
-                                          { Xml.instructionTarget = Text.pack
-                                              "xml-stylesheet"
-                                          , Xml.instructionData =
-                                              Text.pack
-                                                  "type='text/xsl' href='/static/template'"
-                                          }
-                                    ]
-                                , Xml.prologueDoctype = Nothing
-                                , Xml.prologueAfter = []
-                                }
-                            , Xml.documentRoot = Xml.Element
-                                { Xml.elementName = Xml.Name
-                                    { Xml.nameLocalName = Text.pack "root"
-                                    , Xml.nameNamespace = Nothing
-                                    , Xml.namePrefix = Nothing
+    Warp.runSettings settings $ \request respond -> do
+        route <- Route.fromPathInfo $ Wai.pathInfo request
+        case route of
+            Route.Index ->
+                case Http.parseMethod $ Wai.requestMethod request of
+                    Right Http.GET -> do
+                        respond . Wai.responseLBS Http.ok200 [] $ Xml.renderLBS
+                            Xml.def
+                            Xml.Document
+                                { Xml.documentPrologue = Xml.Prologue
+                                    { Xml.prologueBefore =
+                                        [ Xml.MiscInstruction Xml.Instruction
+                                              { Xml.instructionTarget =
+                                                  Text.pack "xml-stylesheet"
+                                              , Xml.instructionData =
+                                                  Text.pack
+                                                      "type='text/xsl' href='/static/template'"
+                                              }
+                                        ]
+                                    , Xml.prologueDoctype = Nothing
+                                    , Xml.prologueAfter = []
                                     }
-                                , Xml.elementAttributes = Map.empty
-                                , Xml.elementNodes = []
+                                , Xml.documentRoot = Xml.Element
+                                    { Xml.elementName = Xml.Name
+                                        { Xml.nameLocalName = Text.pack "root"
+                                        , Xml.nameNamespace = Nothing
+                                        , Xml.namePrefix = Nothing
+                                        }
+                                    , Xml.elementAttributes = Map.empty
+                                    , Xml.elementNodes = []
+                                    }
+                                , Xml.documentEpilogue = []
                                 }
-                            , Xml.documentEpilogue = []
-                            }
-                _ -> respond $ Wai.responseLBS
-                    Http.methodNotAllowed405
-                    []
-                    LazyByteString.empty
-            ["favicon.ico"] ->
+                    _ -> respond $ Wai.responseLBS
+                        Http.methodNotAllowed405
+                        []
+                        LazyByteString.empty
+            Route.Favicon ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
                         filePath <- Package.getDataFileName "favicon.ico"
@@ -77,7 +80,7 @@ main = do
                         Http.methodNotAllowed405
                         []
                         LazyByteString.empty
-            ["robots.txt"] ->
+            Route.Robots ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
                         filePath <- Package.getDataFileName "robots.txt"
@@ -93,7 +96,7 @@ main = do
                         Http.methodNotAllowed405
                         []
                         LazyByteString.empty
-            ["static", "style"] ->
+            Route.Style ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
                         filePath <- Package.getDataFileName "index.css"
@@ -109,7 +112,7 @@ main = do
                         Http.methodNotAllowed405
                         []
                         LazyByteString.empty
-            ["static", "template"] ->
+            Route.Template ->
                 case Http.parseMethod $ Wai.requestMethod request of
                     Right Http.GET -> do
                         filePath <- Package.getDataFileName "index.xsl"
@@ -125,8 +128,6 @@ main = do
                         Http.methodNotAllowed405
                         []
                         LazyByteString.empty
-            _ -> respond
-                $ Wai.responseLBS Http.notFound404 [] LazyByteString.empty
 
 getConfig :: IO Config.Config
 getConfig = do
