@@ -65,6 +65,7 @@ library
         , xml-conduit ^>= 1.9.1
     exposed-modules:
         HW
+        HW.Class.GetDataFileName
         HW.Exception.DisallowedMethod
         HW.Exception.InvalidMethod
         HW.Exception.InvalidOption

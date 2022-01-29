@@ -6,7 +6,7 @@ import qualified HW.Vendor.Http as Http
 import qualified HW.Vendor.Text as Text
 import qualified HW.Vendor.Wai as Wai
 
-handler :: IO Wai.Response
+handler :: Applicative m => m Wai.Response
 handler = do
     pure
         . Common.xmlResponse
