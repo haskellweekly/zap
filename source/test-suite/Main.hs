@@ -1,4 +1,4 @@
-import HW.Main ()
+import Zap.Main ()
 
 main :: IO ()
 main = pure ()

@@ -1,0 +1,112 @@
+cabal-version: 2.2
+
+name: zap
+version: 0.0.0.0
+
+category: Haskell
+data-dir: data
+data-files:
+    favicon.ico
+    index.css
+    index.xsl
+    robots.txt
+description: The web server that powers Haskell Weekly.
+license-file: LICENSE.txt
+license: MIT
+maintainer: Taylor Fausak
+synopsis: Haskell Weekly
+
+source-repository head
+    location: https://github.com/haskellweekly/zap
+    type: git
+
+flag pedantic
+    default: False
+    manual: True
+
+common library
+    build-depends:
+        , base ^>= 4.15.0
+    default-language: Haskell2010
+    ghc-options:
+        -Weverything
+        -Wno-all-missed-specialisations
+        -Wno-implicit-prelude
+        -Wno-missing-deriving-strategies
+        -Wno-missing-export-lists
+        -Wno-missing-exported-signatures
+        -Wno-missing-safe-haskell-mode
+        -Wno-prepositive-qualified-module
+        -Wno-safe
+        -Wno-unsafe
+
+    if flag(pedantic)
+        ghc-options: -Werror
+
+common executable
+    import: library
+
+    build-depends: zap
+    ghc-options: -rtsopts -threaded
+
+library
+    import: library
+
+    autogen-modules: Paths_zap
+    build-depends:
+        , bytestring ^>= 0.11.2
+        , case-insensitive ^>= 1.2.1
+        , containers ^>= 0.6.5
+        , exceptions ^>= 0.10.4
+        , http-types ^>= 0.12.3
+        , text ^>= 1.2.5
+        , wai ^>= 3.2.3
+        , warp ^>= 3.3.18
+        , xml-conduit ^>= 1.9.1
+    exposed-modules:
+        Zap.Class.GetDataFileName
+        Zap.Exception.DisallowedMethod
+        Zap.Exception.InvalidMethod
+        Zap.Exception.InvalidOption
+        Zap.Exception.InvalidPort
+        Zap.Exception.UnexpectedArgument
+        Zap.Exception.UnknownOption
+        Zap.Exception.UnknownRoute
+        Zap.Extra.Http
+        Zap.Handler.Common
+        Zap.Handler.Favicon.Get
+        Zap.Handler.Index.Get
+        Zap.Handler.Robots.Get
+        Zap.Handler.Style.Get
+        Zap.Handler.Template.Get
+        Zap.Main
+        Zap.Server.Application
+        Zap.Server.Settings
+        Zap.Type.Config
+        Zap.Type.Context
+        Zap.Type.Flag
+        Zap.Type.Root
+        Zap.Type.Route
+        Zap.Vendor.ByteString
+        Zap.Vendor.Exception
+        Zap.Vendor.Http
+        Zap.Vendor.Map
+        Zap.Vendor.Text
+        Zap.Vendor.Wai
+        Zap.Vendor.Warp
+        Zap.Vendor.Xml
+    hs-source-dirs: source/library
+    other-modules: Paths_zap
+
+executable zap
+    import: executable
+
+    hs-source-dirs: source/executable
+    main-is: Main.hs
+
+test-suite zap-test-suite
+    import: executable
+
+    hs-source-dirs: source/test-suite
+    main-is: Main.hs
+    type: exitcode-stdio-1.0

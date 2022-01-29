@@ -26,8 +26,8 @@
                     TODO
                 </main>
                 <footer class="border-top container my-3 pt-3 text-muted">
-                    <a href="https://github.com/haskellweekly/hw">
-                        github.com/haskellweekly/hw
+                    <a href="https://github.com/haskellweekly/zap">
+                        github.com/haskellweekly/zap
                     </a>
                 </footer>
             </body>
