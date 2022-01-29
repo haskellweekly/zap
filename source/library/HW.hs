@@ -34,15 +34,18 @@ main :: IO ()
 main = do
     config <- getConfig
     let settings = configToSettings config
-    Warp.runSettings settings $ \request respond -> do
-        method <-
-            either (Exception.throwM . InvalidMethod.InvalidMethod) pure
-            . Http.parseMethod
-            $ Wai.requestMethod request
-        route <- Route.fromPathInfo $ Wai.pathInfo request
-        handler <- getHandler method route
-        response <- handler
-        respond response
+    Warp.runSettings settings application
+
+application :: Wai.Application
+application request respond = do
+    method <-
+        either (Exception.throwM . InvalidMethod.InvalidMethod) pure
+        . Http.parseMethod
+        $ Wai.requestMethod request
+    route <- Route.fromPathInfo $ Wai.pathInfo request
+    handler <- getHandler method route
+    response <- handler
+    respond response
 
 type Handler = IO Wai.Response
 
