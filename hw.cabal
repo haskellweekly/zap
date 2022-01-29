@@ -83,6 +83,7 @@ library
         HW.Server.Application
         HW.Server.Settings
         HW.Type.Config
+        HW.Type.Context
         HW.Type.Flag
         HW.Type.Root
         HW.Type.Route

@@ -6,6 +6,7 @@ import qualified Data.Version as Version
 import qualified HW.Server.Application as Application
 import qualified HW.Server.Settings as Settings
 import qualified HW.Type.Config as Config
+import qualified HW.Type.Context as Context
 import qualified HW.Type.Flag as Flag
 import qualified HW.Vendor.Exception as Exception
 import qualified HW.Vendor.Warp as Warp
@@ -17,8 +18,10 @@ import qualified System.Exit as Exit
 main :: IO ()
 main = do
     config <- getConfig
-    let settings = Settings.fromConfig config
-    Warp.runSettings settings Application.application
+    context <- Context.fromConfig config
+    Warp.runSettings
+        (Settings.fromConfig config)
+        (Application.fromContext context)
 
 getConfig :: IO Config.Config
 getConfig = do

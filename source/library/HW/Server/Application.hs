@@ -7,13 +7,14 @@ import qualified HW.Handler.Index.Get as Index.Get
 import qualified HW.Handler.Robots.Get as Robots.Get
 import qualified HW.Handler.Style.Get as Style.Get
 import qualified HW.Handler.Template.Get as Template.Get
+import qualified HW.Type.Context as Context
 import qualified HW.Type.Route as Route
 import qualified HW.Vendor.Exception as Exception
 import qualified HW.Vendor.Http as Http
 import qualified HW.Vendor.Wai as Wai
 
-application :: Wai.Application
-application request respond = do
+fromContext :: Context.Context -> Wai.Application
+fromContext _ request respond = do
     method <-
         either (Exception.throwM . InvalidMethod.InvalidMethod) pure
         . Http.parseMethod
