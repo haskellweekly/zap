@@ -1,12 +1,15 @@
 module Zap.Type.Root where
 
+import qualified Zap.Type.Meta as Meta
 import qualified Zap.Vendor.Map as Map
 import qualified Zap.Vendor.Text as Text
 import qualified Zap.Vendor.Xml as Xml
 
-newtype Root = Root
-    { nodes :: [Xml.Node]
-    } deriving (Eq, Show)
+data Root = Root
+    { meta :: Meta.Meta
+    , page :: [Xml.Node]
+    }
+    deriving (Eq, Show)
 
 toDocument :: Root -> Xml.Document
 toDocument root = Xml.Document
@@ -28,7 +31,18 @@ toDocument root = Xml.Document
             , Xml.namePrefix = Nothing
             }
         , Xml.elementAttributes = Map.empty
-        , Xml.elementNodes = nodes root
+        , Xml.elementNodes =
+            [ Xml.NodeElement . Meta.toElement $ meta root
+            , Xml.NodeElement Xml.Element
+                { Xml.elementName = Xml.Name
+                    { Xml.nameLocalName = Text.pack "page"
+                    , Xml.nameNamespace = Nothing
+                    , Xml.namePrefix = Nothing
+                    }
+                , Xml.elementAttributes = Map.empty
+                , Xml.elementNodes = page root
+                }
+            ]
         }
     , Xml.documentEpilogue = []
     }

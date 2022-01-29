@@ -2,11 +2,11 @@ module Zap.Type.Config where
 
 import qualified Control.Monad as Monad
 import qualified Data.String as String
+import qualified Text.Read as Read
 import qualified Zap.Exception.InvalidPort as InvalidPort
 import qualified Zap.Type.Flag as Flag
 import qualified Zap.Vendor.Exception as Exception
 import qualified Zap.Vendor.Warp as Warp
-import qualified Text.Read as Read
 
 data Config = Config
     { help :: Bool

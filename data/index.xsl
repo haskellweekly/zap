@@ -25,10 +25,12 @@
                 <main class="container my-3">
                     TODO
                 </main>
-                <footer class="border-top container my-3 pt-3 text-muted">
-                    <a href="https://github.com/haskellweekly/zap">
-                        github.com/haskellweekly/zap
-                    </a>
+                <footer class="border-top container my-3 pt-3 text-center text-muted">
+                    <p>
+                        &#x26a1; Powered by
+                        <a href="https://github.com/haskellweekly/zap">Zap</a>
+                        version <xsl:value-of select="normalize-space(meta/version)" />.
+                    </p>
                 </footer>
             </body>
         </html>

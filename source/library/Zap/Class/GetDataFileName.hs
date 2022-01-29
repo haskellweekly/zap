@@ -1,6 +1,6 @@
 module Zap.Class.GetDataFileName where
 
-import qualified Paths_zap as Package
+import qualified Zap.Package as Package
 
 class Monad m => GetDataFileName m where
     getDataFileName :: FilePath -> m FilePath

@@ -2,11 +2,11 @@ module Zap.Type.Flag where
 
 import qualified Data.Char as Char
 import qualified Data.List as List
+import qualified System.Console.GetOpt as Console
 import qualified Zap.Exception.InvalidOption as InvalidOption
 import qualified Zap.Exception.UnexpectedArgument as UnexpectedArgument
 import qualified Zap.Exception.UnknownOption as UnknownOption
 import qualified Zap.Vendor.Exception as Exception
-import qualified System.Console.GetOpt as Console
 
 data Flag
     = Help

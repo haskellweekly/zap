@@ -1,6 +1,8 @@
 module Zap.Handler.Index.Get where
 
 import qualified Zap.Handler.Common as Common
+import qualified Zap.Package as Package
+import qualified Zap.Type.Meta as Meta
 import qualified Zap.Type.Root as Root
 import qualified Zap.Vendor.Http as Http
 import qualified Zap.Vendor.Text as Text
@@ -19,4 +21,7 @@ handler = do
                     $ Text.pack "</static/style>; rel=preload; as=style"
                 )
               ]
-        $ Root.toDocument Root.Root { Root.nodes = [] }
+        $ Root.toDocument Root.Root
+              { Root.meta = Meta.Meta { Meta.version = Package.version }
+              , Root.page = []
+              }

@@ -1,7 +1,7 @@
 cabal-version: 2.2
 
 name: zap
-version: 0.0.0.0
+version: 0.2022.1.29
 
 category: Haskell
 data-dir: data
@@ -80,11 +80,13 @@ library
         Zap.Handler.Style.Get
         Zap.Handler.Template.Get
         Zap.Main
+        Zap.Package
         Zap.Server.Application
         Zap.Server.Settings
         Zap.Type.Config
         Zap.Type.Context
         Zap.Type.Flag
+        Zap.Type.Meta
         Zap.Type.Root
         Zap.Type.Route
         Zap.Vendor.ByteString

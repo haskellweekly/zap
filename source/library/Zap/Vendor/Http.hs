@@ -6,5 +6,5 @@ module Zap.Vendor.Http
     , module Network.HTTP.Types
     ) where
 
-import Zap.Extra.Http
 import Network.HTTP.Types
+import Zap.Extra.Http

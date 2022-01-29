@@ -3,6 +3,10 @@ module Zap.Main where
 import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Data.Version as Version
+import qualified System.Console.GetOpt as Console
+import qualified System.Environment as Environment
+import qualified System.Exit as Exit
+import qualified Zap.Package as Package
 import qualified Zap.Server.Application as Application
 import qualified Zap.Server.Settings as Settings
 import qualified Zap.Type.Config as Config
@@ -10,10 +14,6 @@ import qualified Zap.Type.Context as Context
 import qualified Zap.Type.Flag as Flag
 import qualified Zap.Vendor.Exception as Exception
 import qualified Zap.Vendor.Warp as Warp
-import qualified Paths_zap as Package
-import qualified System.Console.GetOpt as Console
-import qualified System.Environment as Environment
-import qualified System.Exit as Exit
 
 main :: IO ()
 main = do

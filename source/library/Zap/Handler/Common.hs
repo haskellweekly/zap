@@ -1,5 +1,7 @@
 module Zap.Handler.Common where
 
+import qualified Zap.Package as Package
+import qualified Zap.Type.Meta as Meta
 import qualified Zap.Type.Root as Root
 import qualified Zap.Vendor.Http as Http
 import qualified Zap.Vendor.Map as Map
@@ -17,7 +19,8 @@ statusResponse status headers =
             : headers
             )
         $ Root.toDocument Root.Root
-              { Root.nodes =
+              { Root.meta = Meta.Meta { Meta.version = Package.version }
+              , Root.page =
                   [ Xml.NodeElement Xml.Element
                       { Xml.elementName = Xml.Name
                           { Xml.nameLocalName = Text.pack "code"
