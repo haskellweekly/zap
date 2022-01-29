@@ -16,6 +16,7 @@ import qualified HW.Handler.Style.Get as Style.Get
 import qualified HW.Handler.Template.Get as Template.Get
 import qualified HW.Type.Config as Config
 import qualified HW.Type.Flag as Flag
+import qualified HW.Type.Root as Root
 import qualified HW.Type.Route as Route
 import qualified HW.Vendor.ByteString as ByteString
 import qualified HW.Vendor.Exception as Exception
@@ -149,38 +150,39 @@ isExceptionType proxy someException =
 
 statusResponse :: Http.Status -> Http.ResponseHeaders -> Wai.Response
 statusResponse status headers =
-    Common.xmlResponse status headers . Common.elementToDocument $ Xml.Element
-        { Xml.elementName = Xml.Name
-            { Xml.nameLocalName = Text.pack "status"
-            , Xml.nameNamespace = Nothing
-            , Xml.namePrefix = Nothing
-            }
-        , Xml.elementAttributes = Map.empty
-        , Xml.elementNodes =
-            [ Xml.NodeElement Xml.Element
-                { Xml.elementName = Xml.Name
-                    { Xml.nameLocalName = Text.pack "code"
-                    , Xml.nameNamespace = Nothing
-                    , Xml.namePrefix = Nothing
-                    }
-                , Xml.elementAttributes = Map.empty
-                , Xml.elementNodes =
-                    [ Xml.NodeContent . Text.pack . show $ Http.statusCode
-                          status
-                    ]
-                }
-            , Xml.NodeElement Xml.Element
-                { Xml.elementName = Xml.Name
-                    { Xml.nameLocalName = Text.pack "message"
-                    , Xml.nameNamespace = Nothing
-                    , Xml.namePrefix = Nothing
-                    }
-                , Xml.elementAttributes = Map.empty
-                , Xml.elementNodes =
-                    [ Xml.NodeContent
-                      . Text.decodeUtf8With Text.lenientDecode
-                      $ Http.statusMessage status
-                    ]
-                }
-            ]
-        }
+    Common.xmlResponse
+            status
+            ((Http.hContentType, Text.encodeUtf8 $ Text.pack "text/xml")
+            : headers
+            )
+        $ Root.toDocument Root.Root
+              { Root.nodes =
+                  [ Xml.NodeElement Xml.Element
+                      { Xml.elementName = Xml.Name
+                          { Xml.nameLocalName = Text.pack "code"
+                          , Xml.nameNamespace = Nothing
+                          , Xml.namePrefix = Nothing
+                          }
+                      , Xml.elementAttributes = Map.empty
+                      , Xml.elementNodes =
+                          [ Xml.NodeContent
+                            . Text.pack
+                            . show
+                            $ Http.statusCode status
+                          ]
+                      }
+                  , Xml.NodeElement Xml.Element
+                      { Xml.elementName = Xml.Name
+                          { Xml.nameLocalName = Text.pack "message"
+                          , Xml.nameNamespace = Nothing
+                          , Xml.namePrefix = Nothing
+                          }
+                      , Xml.elementAttributes = Map.empty
+                      , Xml.elementNodes =
+                          [ Xml.NodeContent
+                            . Text.decodeUtf8With Text.lenientDecode
+                            $ Http.statusMessage status
+                          ]
+                      }
+                  ]
+              }

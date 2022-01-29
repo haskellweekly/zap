@@ -79,6 +79,7 @@ library
         HW.Handler.Template.Get
         HW.Type.Config
         HW.Type.Flag
+        HW.Type.Root
         HW.Type.Route
         HW.Vendor.ByteString
         HW.Vendor.Exception
