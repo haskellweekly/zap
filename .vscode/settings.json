@@ -1,3 +1,4 @@
 {
-    "purple-yolk.brittany.command": "brittany --config-file config/brittany.yaml --write-mode inplace"
+    "purple-yolk.brittany.command": "brittany --config-file config/brittany.yaml --write-mode inplace",
+    "purple-yolk.hlint.command": "hlint --hint config/hlint.yaml --json --no-exit-code"
 }

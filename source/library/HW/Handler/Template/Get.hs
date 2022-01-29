@@ -1,9 +1,9 @@
 module HW.Handler.Template.Get where
 
+import qualified HW.Class.GetDataFileName as GetDataFileName
 import qualified HW.Vendor.Http as Http
 import qualified HW.Vendor.Text as Text
 import qualified HW.Vendor.Wai as Wai
-import qualified HW.Class.GetDataFileName as GetDataFileName
 
 handler :: GetDataFileName.GetDataFileName m => m Wai.Response
 handler = do
