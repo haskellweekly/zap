@@ -10,6 +10,9 @@ handler = do
     filePath <- Package.getDataFileName "robots.txt"
     pure $ Wai.responseFile
         Http.ok200
-        [(Http.hContentType, Text.encodeUtf8 $ Text.pack "text/plain")]
+        [ ( Http.hContentType
+          , Text.encodeUtf8 $ Text.pack "text/plain; charset=UTF-8"
+          )
+        ]
         filePath
         Nothing

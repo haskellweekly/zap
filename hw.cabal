@@ -55,6 +55,7 @@ library
     autogen-modules: Paths_hw
     build-depends:
         , bytestring ^>= 0.11.2
+        , case-insensitive ^>= 1.2.1
         , containers ^>= 0.6.5
         , exceptions ^>= 0.10.4
         , http-types ^>= 0.12.3
@@ -71,6 +72,7 @@ library
         HW.Exception.UnexpectedArgument
         HW.Exception.UnknownOption
         HW.Exception.UnknownRoute
+        HW.Extra.Http
         HW.Handler.Common
         HW.Handler.Favicon.Get
         HW.Handler.Index.Get

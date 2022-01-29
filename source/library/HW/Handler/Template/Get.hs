@@ -10,6 +10,9 @@ handler = do
     filePath <- Package.getDataFileName "index.xsl"
     pure $ Wai.responseFile
         Http.ok200
-        [(Http.hContentType, Text.encodeUtf8 $ Text.pack "text/xsl")]
+        [ ( Http.hContentType
+          , Text.encodeUtf8 $ Text.pack "text/xsl; charset=UTF-8"
+          )
+        ]
         filePath
         Nothing

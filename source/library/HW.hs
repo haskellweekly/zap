@@ -152,7 +152,9 @@ statusResponse :: Http.Status -> Http.ResponseHeaders -> Wai.Response
 statusResponse status headers =
     Common.xmlResponse
             status
-            ((Http.hContentType, Text.encodeUtf8 $ Text.pack "text/xml")
+            (( Http.hContentType
+             , Text.encodeUtf8 $ Text.pack "text/xml; charset=UTF-8"
+             )
             : headers
             )
         $ Root.toDocument Root.Root

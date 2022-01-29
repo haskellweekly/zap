@@ -10,6 +10,9 @@ handler = do
     filePath <- Package.getDataFileName "index.css"
     pure $ Wai.responseFile
         Http.ok200
-        [(Http.hContentType, Text.encodeUtf8 $ Text.pack "text/css")]
+        [ ( Http.hContentType
+          , Text.encodeUtf8 $ Text.pack "text/css; charset=UTF-8"
+          )
+        ]
         filePath
         Nothing

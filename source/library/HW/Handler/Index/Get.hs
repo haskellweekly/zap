@@ -11,5 +11,12 @@ handler = do
     pure
         . Common.xmlResponse
               Http.ok200
-              [(Http.hContentType, Text.encodeUtf8 $ Text.pack "text/xml")]
+              [ ( Http.hContentType
+                , Text.encodeUtf8 $ Text.pack "text/xml; charset=UTF-8"
+                )
+              , ( Http.hLink
+                , Text.encodeUtf8
+                    $ Text.pack "</static/style>; rel=preload; as=style"
+                )
+              ]
         $ Root.toDocument Root.Root { Root.nodes = [] }
