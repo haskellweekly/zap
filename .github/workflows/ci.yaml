@@ -1,0 +1,60 @@
+name: CI
+on: push
+jobs:
+  ci:
+    strategy:
+      matrix:
+        include:
+          - { platform: ubuntu }
+          - { platform: macos }
+          - { platform: windows, extension: .exe }
+    runs-on: ${{ matrix.platform }}-latest
+    name: ${{ matrix.platform }}
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - run: mkdir artifact
+
+      - id: artifact
+        run: echo '::set-output name=directory::artifact/${{ matrix.platform }}'
+
+      - run: mkdir ${{ steps.artifact.outputs.directory }}
+
+      - id: setup-haskell
+        uses: haskell/actions/setup@v1
+        with:
+          ghc-version: 9.2.1
+
+      - run: cabal configure --enable-tests --flags pedantic --jobs
+
+      - run: cabal freeze
+
+      - run: cat cabal.project.freeze
+
+      - run: cp cabal.project.freeze ${{ steps.artifact.outputs.directory }}
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.setup-haskell.outputs.cabal-store }}
+          key: ${{ matrix.platform }}-${{ hashFiles('cabal.project.freeze') }}
+          restore-keys: ${{ matrix.platform }}-
+
+      - run: cabal build
+
+      - run: cabal install --install-method copy --installdir ${{ steps.artifact.outputs.directory }} .
+
+      - run: cabal test --test-show-details direct
+
+      - run: cabal check
+
+      - run: cabal sdist --output-dir ${{ steps.artifact.outputs.directory }}
+
+      - uses: svenstaro/upx-action@v2
+        with:
+          file: ${{ steps.artifact.outputs.directory }}/zap${{ matrix.extension }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zap-${{ github.sha }}
+          path: artifact
