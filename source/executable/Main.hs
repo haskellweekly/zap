@@ -1,5 +1,5 @@
 module Main
-    ( module HW
+    ( module HW.Main
     ) where
 
-import HW (main)
+import HW.Main (main)

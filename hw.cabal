@@ -64,7 +64,6 @@ library
         , warp ^>= 3.3.18
         , xml-conduit ^>= 1.9.1
     exposed-modules:
-        HW
         HW.Class.GetDataFileName
         HW.Exception.DisallowedMethod
         HW.Exception.InvalidMethod
@@ -80,6 +79,9 @@ library
         HW.Handler.Robots.Get
         HW.Handler.Style.Get
         HW.Handler.Template.Get
+        HW.Main
+        HW.Server.Application
+        HW.Server.Settings
         HW.Type.Config
         HW.Type.Flag
         HW.Type.Root
